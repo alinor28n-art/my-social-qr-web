@@ -1,0 +1,7 @@
+name = "my-social-qr"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "./public"
+
+[[kv_namespaces]]
+binding = "PROFILES"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
