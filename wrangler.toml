@@ -1,3 +1,7 @@
+
+# wrangler.toml
+name = 'my-social-qr-web'
+
 name = "my-social-qr"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "./public"
