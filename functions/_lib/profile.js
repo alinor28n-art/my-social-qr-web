@@ -96,6 +96,13 @@ function safeCover(value, previous) {
   return safeImage(value, previous?.cover, "/api/cover/");
 }
 
+function safeCvUrl(value, previous) {
+  const url = text(value, 500);
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url) && !/\s/.test(url)) return url;
+  return previous || "";
+}
+
 function safeContact(value) {
   const src = value && typeof value === "object" ? value : {};
   return {
@@ -129,7 +136,10 @@ export function sanitizeProfile(input, id, previous) {
   return {
     id,
     name: text(src.name, 80) || previous?.name || "",
+    headline: text(src.headline, 80),
     bio: text(src.bio, 300),
+    cvUrl: safeCvUrl(src.cvUrl, previous?.cvUrl),
+    country: text(src.country, 60),
     avatar: safeAvatar(src.avatar, previous),
     cover: safeCover(src.cover, previous),
     locale: text(src.locale, 8) || "ar",
@@ -146,7 +156,10 @@ export function publicProfile(record) {
   return {
     id: record.id,
     name: record.name || "",
+    headline: record.headline || "",
     bio: record.bio || "",
+    cvUrl: record.cvUrl || "",
+    country: record.country || "",
     avatar: record.avatar || "",
     cover: record.cover || "",
     locale: record.locale || "ar",
