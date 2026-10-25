@@ -45,7 +45,12 @@ export async function onRequestPut({ params, request, env }) {
     tokenHash: existing?.tokenHash || (await sha256Hex(token))
   };
 
-  await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(record));
+  await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(record), {
+    metadata: {
+      enabled: record.enabled !== false,
+      updatedAt: record.updatedAt
+    }
+  });
   return json({ ok: true, id, updatedAt: record.updatedAt });
 }
 
