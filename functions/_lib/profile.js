@@ -76,12 +76,24 @@ function boolean(value) {
   return value === true;
 }
 
+function safeImage(value, previous, pathPrefix) {
+  const image = text(value, 500);
+  if (!image) return previous || "";
+  if (image.startsWith(pathPrefix)) return image;
+  if (/^https?:\/\//i.test(image)) return image;
+  return previous || "";
+}
+
 function safeAvatar(value, previous) {
   const avatar = text(value, 500);
   if (!avatar) return "";
   if (avatar.startsWith("/api/avatar/")) return avatar;
   if (/^https?:\/\//i.test(avatar)) return avatar;
   return previous?.avatar || "";
+}
+
+function safeCover(value, previous) {
+  return safeImage(value, previous?.cover, "/api/cover/");
 }
 
 function safeContact(value) {
@@ -119,6 +131,7 @@ export function sanitizeProfile(input, id, previous) {
     name: text(src.name, 80) || previous?.name || "",
     bio: text(src.bio, 300),
     avatar: safeAvatar(src.avatar, previous),
+    cover: safeCover(src.cover, previous),
     locale: text(src.locale, 8) || "ar",
     contact: safeContact(src.contact),
     links: safeLinks(src.links, previous),
@@ -135,6 +148,7 @@ export function publicProfile(record) {
     name: record.name || "",
     bio: record.bio || "",
     avatar: record.avatar || "",
+    cover: record.cover || "",
     locale: record.locale || "ar",
     contact: record.contact || {
       phone: "",
@@ -279,6 +293,7 @@ export function renderLink(link) {
   const target = platformTarget(link.platform, link.value);
   if (!target) return null;
   return {
+    platform: link.platform,
     label,
     target,
     color: meta.color,
