@@ -88,7 +88,9 @@ export async function onRequestPut({ params, request, env }) {
 
   if (existing) {
     const updated = { ...existing, avatar: avatarUrl, updatedAt: now };
-    await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(updated));
+    await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(updated), {
+      metadata: { enabled: updated.enabled !== false, updatedAt: now }
+    });
   } else {
     const placeholder = {
       id,
@@ -103,7 +105,9 @@ export async function onRequestPut({ params, request, env }) {
       updatedAt: now,
       tokenHash: await sha256Hex(token)
     };
-    await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(placeholder));
+    await env.PROFILES.put(PROFILE_KEY(id), JSON.stringify(placeholder), {
+      metadata: { enabled: true, updatedAt: now }
+    });
   }
 
   return json({ avatar: avatarUrl });
