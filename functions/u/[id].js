@@ -4,6 +4,7 @@ import {
   PROFILE_KEY,
   renderLink
 } from "../_lib/profile.js";
+import qrcode from "../_lib/qrcode.js";
 
 const ICONS = {
   instagram:
@@ -90,6 +91,20 @@ function jsonLdScript(data) {
     .replace(/&/g, "\\u0026")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
+}
+
+function buildQrSvg(value) {
+  const payload = String(value || "").trim();
+  if (!payload) return "";
+  try {
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs["UTF-8"];
+    const qr = qrcode(0, "M");
+    qr.addData(payload, "Byte");
+    qr.make();
+    return qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  } catch (error) {
+    return "";
+  }
 }
 
 function pageShell(title, content, options = {}) {
@@ -675,21 +690,24 @@ const CARD_STYLES = `
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: max(34px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+    flex-direction: column;
   }
   .biz-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
     width: 100%;
-    max-width: 450px;
-    padding: 18px 20px 16px;
-    border-radius: 34px;
-    background: linear-gradient(155deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.68) 48%, rgba(248,250,252,.78) 100%);
-    border: 1px solid rgba(255,255,255,.96);
-    box-shadow: var(--biz-shadow), inset 0 1px 0 rgba(255,255,255,.95);
-    backdrop-filter: blur(24px) saturate(1.08);
-    -webkit-backdrop-filter: blur(24px) saturate(1.08);
+    max-width: none;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: max(18px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+    border-radius: 0;
+    background:
+      radial-gradient(680px 420px at 50% -150px, rgba(37,99,235,.14) 0%, rgba(37,99,235,0) 68%),
+      linear-gradient(180deg, #ffffff 0%, #fbfcfe 46%, #f6f8fc 100%);
+    border: 0;
+    box-shadow: none;
     overflow: hidden;
   }
   .biz-card::before {
@@ -698,9 +716,7 @@ const CARD_STYLES = `
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    background:
-      linear-gradient(130deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 34%, rgba(255,255,255,0) 68%, rgba(255,255,255,.28) 100%),
-      radial-gradient(320px 180px at 50% -60px, rgba(255,255,255,.85), rgba(255,255,255,0) 70%);
+    background: radial-gradient(460px 240px at 50% -90px, rgba(37,99,235,.10), rgba(37,99,235,0) 70%);
   }
   .biz-card > * { position: relative; z-index: 1; }
   .biz-topbar {
@@ -708,7 +724,7 @@ const CARD_STYLES = `
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 2px 2px 16px;
+    padding: 0 2px 10px;
   }
   .biz-brand {
     display: inline-flex;
@@ -746,8 +762,8 @@ const CARD_STYLES = `
   }
   .biz-verified svg { width: 9px; height: 9px; }
   .biz-top-action {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: 1px solid rgba(15,23,42,.06);
     background: rgba(255,255,255,.68);
@@ -762,28 +778,36 @@ const CARD_STYLES = `
   .biz-top-action:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 14px 24px -16px rgba(15,23,42,.5), inset 0 1px 0 #fff; }
   .biz-top-action:active { transform: scale(.97); }
   .biz-top-action svg { width: 17px; height: 17px; }
-  .biz-head { text-align: center; padding: 2px 4px 20px; }
+  .biz-head { padding: 0 2px 14px; }
+  .biz-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: start;
+  }
+  .biz-identity-text { flex: 1 1 auto; min-width: 0; }
   .biz-photo {
     position: relative;
-    width: 126px;
-    height: 126px;
-    margin: 0 auto 16px;
-    padding: 7px;
+    flex: 0 0 auto;
+    width: 78px;
+    height: 78px;
+    margin: 0;
+    padding: 4px;
     border-radius: 50%;
     background: linear-gradient(145deg, #f8fafc 0%, #e5e7eb 100%);
     box-shadow:
-      0 22px 40px -20px rgba(15,23,42,.45),
-      0 8px 18px -14px rgba(15,23,42,.2),
+      0 16px 30px -20px rgba(15,23,42,.5),
+      0 6px 14px -12px rgba(15,23,42,.2),
       inset 0 1px 1px rgba(255,255,255,.98),
-      inset 0 -4px 10px rgba(148,163,184,.22);
+      inset 0 -3px 8px rgba(148,163,184,.2);
   }
   .biz-photo::before {
     content: "";
     position: absolute;
-    inset: 3px;
+    inset: 2px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,.9);
-    box-shadow: inset 0 2px 7px rgba(148,163,184,.28);
+    box-shadow: inset 0 2px 7px rgba(148,163,184,.22);
     pointer-events: none;
   }
   .biz-photo-inner {
@@ -799,51 +823,58 @@ const CARD_STYLES = `
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
   }
   .biz-photo-inner img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .biz-initial { color: #fff; font-size: 44px; font-weight: 800; line-height: 1; text-shadow: 0 4px 14px rgba(0,0,0,.24); }
+  .biz-initial { color: #fff; font-size: 30px; font-weight: 800; line-height: 1; text-shadow: 0 4px 14px rgba(0,0,0,.24); }
   .biz-photo-badge {
     position: absolute;
-    inset-inline-end: 6px;
-    bottom: 6px;
-    width: 29px;
-    height: 29px;
+    inset-inline-end: 2px;
+    bottom: 2px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     background: #111827;
-    border: 3px solid #f8fafc;
-    box-shadow: 0 8px 14px -8px rgba(15,23,42,.65);
+    border: 2px solid #f8fafc;
+    box-shadow: 0 6px 12px -8px rgba(15,23,42,.65);
   }
-  .biz-photo-badge svg { width: 12px; height: 12px; }
+  .biz-photo-badge svg { width: 9px; height: 9px; }
   .biz-head h1 {
     margin: 0;
     color: var(--biz-ink);
-    font-size: clamp(26px, 7vw, 33px);
+    font-size: clamp(20px, 5.6vw, 25px);
     line-height: 1.2;
     font-weight: 800;
-    letter-spacing: -.6px;
+    letter-spacing: -.4px;
+    text-align: start;
     overflow-wrap: anywhere;
   }
   .biz-role {
-    margin: 6px 0 0;
+    margin: 3px 0 0;
     color: var(--biz-soft);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: .02em;
+    text-align: start;
     overflow-wrap: anywhere;
   }
   .biz-tagline {
-    max-width: 310px;
-    margin: 8px auto 0;
+    max-width: none;
+    margin: 8px 0 0;
     color: var(--biz-soft);
-    font-size: 13px;
-    font-style: italic;
-    line-height: 1.8;
+    font-size: 11.5px;
+    line-height: 1.65;
+    text-align: center;
     white-space: pre-line;
     overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
   }
-  .biz-chips { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 7px; margin-top: 13px; }
+  .biz-chips { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
   .biz-chip {
     display: inline-flex;
     align-items: center;
@@ -863,13 +894,13 @@ const CARD_STYLES = `
   .biz-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin: 0 0 20px;
+    gap: 8px;
+    margin: 0 0 14px;
   }
   .biz-actions > .biz-action:only-child { grid-column: 1 / -1; }
   .biz-action {
     position: relative;
-    min-height: 51px;
+    min-height: 42px;
     padding: 0 13px;
     border-radius: 999px;
     display: inline-flex;
@@ -885,7 +916,7 @@ const CARD_STYLES = `
       0 16px 28px -18px rgba(31,41,55,.9),
       inset 0 1px 0 rgba(255,255,255,.2),
       inset 0 -2px 7px rgba(0,0,0,.28);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: .01em;
     cursor: pointer;
@@ -903,102 +934,113 @@ const CARD_STYLES = `
   .biz-action svg { width: 16px; height: 16px; flex: 0 0 auto; }
   .biz-action:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .biz-social {
-    padding: 17px 0 19px;
+    padding: 12px 0 14px;
     border-top: 1px solid var(--biz-line);
     border-bottom: 1px solid var(--biz-line);
   }
-  .biz-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .biz-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
   .biz-panel-head h2 { margin: 0; color: var(--biz-ink-2); font-size: 10.5px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
   .biz-count { color: var(--biz-mute); font-size: 10px; font-weight: 700; }
-  .biz-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+  .biz-tiles { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 12px 6px; }
   .biz-tile {
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,.82);
-    border: 1px solid rgba(255,255,255,.95);
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 2px;
+    border-radius: 12px;
+    background: transparent;
+    border: 0;
     color: var(--tile, #374151);
     text-decoration: none;
-    box-shadow: 0 12px 24px -18px rgba(15,23,42,.42), inset 0 1px 0 rgba(255,255,255,.98);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    transition: transform .18s ease, opacity .18s ease;
   }
-  .biz-tile:hover { transform: translateY(-3px); background: #fff; box-shadow: 0 18px 30px -18px rgba(15,23,42,.48), inset 0 1px 0 #fff; }
-  .biz-tile:active { transform: scale(.97); }
-  .biz-tile svg { width: 23px; height: 23px; }
+  .biz-tile:hover { transform: translateY(-2px); opacity: .82; }
+  .biz-tile:active { transform: scale(.96); }
+  .biz-tile svg { width: 34px; height: 34px; }
+  .biz-tile-label {
+    max-width: 100%;
+    color: var(--biz-soft);
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .biz-empty { margin: 0; padding: 16px; border-radius: 16px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.85); color: var(--biz-mute); font-size: 11px; text-align: center; }
   .biz-vcard {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 14px;
     flex-wrap: wrap;
-    margin: 20px 0 16px;
-    padding: 16px;
-    border-radius: 24px;
-    background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(248,250,252,.7));
-    border: 1px solid rgba(255,255,255,.96);
-    box-shadow: 0 20px 40px -30px rgba(15,23,42,.42), inset 0 1px 0 #fff;
+    margin: 14px 0 12px;
+    padding: 14px;
+    border-radius: 18px;
+    background: #f7f9fc;
+    border: 1px solid var(--biz-line);
+    box-shadow: none;
   }
   .biz-qr {
     flex: 0 0 auto;
-    width: 150px;
-    height: 150px;
-    padding: 10px;
-    border-radius: 18px;
+    width: 118px;
+    height: 118px;
+    padding: 9px;
+    border-radius: 14px;
     background: #fff;
+    border: 1px solid var(--biz-line);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 2px 7px rgba(148,163,184,.2), 0 12px 24px -18px rgba(15,23,42,.4);
+    box-shadow: 0 14px 28px -24px rgba(15,23,42,.55);
   }
   .biz-qr svg { width: 100%; height: 100%; display: block; }
-  .biz-qr svg path { fill: #111827; }
+  .biz-qr svg path { fill: #0f172a; }
   .biz-qr-fallback { color: var(--biz-mute); font-size: 10px; line-height: 1.6; text-align: center; }
-  .biz-vcard-copy { flex: 1 1 190px; min-width: 0; }
+  .biz-vcard-copy { flex: 1 1 180px; min-width: 0; }
   .biz-eyebrow { color: var(--biz-mute); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
-  .biz-vcard-copy h2 { margin: 4px 0 4px; color: var(--biz-ink); font-size: 16px; line-height: 1.35; letter-spacing: -.2px; }
-  .biz-vcard-copy p { margin: 0; color: var(--biz-soft); font-size: 11.5px; line-height: 1.7; }
+  .biz-vcard-copy h2 { margin: 0 0 4px; color: var(--biz-ink); font-size: 14px; line-height: 1.35; letter-spacing: -.2px; }
+  .biz-vcard-copy p { margin: 0; color: var(--biz-soft); font-size: 10.5px; line-height: 1.55; }
   .biz-vcard-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 10px;
-    padding: 8px 13px;
+    margin-top: 8px;
+    padding: 7px 12px;
     border: 0;
     border-radius: 999px;
     background: #111827;
     color: #fff;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 12px 22px -14px rgba(17,24,39,.85), inset 0 1px 0 rgba(255,255,255,.2);
     transition: transform .18s ease, box-shadow .18s ease;
   }
   .biz-vcard-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 26px -14px rgba(17,24,39,.9), inset 0 1px 0 rgba(255,255,255,.24); }
-  .biz-vcard-btn svg { width: 14px; height: 14px; }
-  .biz-vcard-note { display: block; margin-top: 5px; color: var(--biz-mute); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
-  .biz-footer { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 4px; }
+  .biz-vcard-btn svg { width: 13px; height: 13px; }
+  .biz-vcard-note { display: none; }
+  .biz-footer { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: auto; padding-top: 2px; }
   .biz-footer-icons { display: flex; align-items: center; gap: 7px; }
   .biz-footer-icon {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 1px solid rgba(15,23,42,.06);
-    background: rgba(255,255,255,.68);
+    border: 0;
+    background: transparent;
     color: var(--biz-soft);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 7px 14px -12px rgba(15,23,42,.4), inset 0 1px 0 #fff;
-    transition: transform .18s ease, background .18s ease, color .18s ease;
+    transition: transform .18s ease, color .18s ease;
   }
-  .biz-footer-icon:hover { transform: translateY(-2px); background: #fff; color: var(--biz-ink); }
-  .biz-footer-icon svg { width: 14px; height: 14px; }
-  .biz-footer-meta { display: flex; align-items: center; gap: 5px; color: var(--biz-mute); font-size: 9.5px; letter-spacing: .02em; }
+  .biz-footer-icon:hover { transform: translateY(-2px); background: transparent; color: var(--biz-ink); }
+  .biz-footer-icon svg { width: 15px; height: 15px; }
+  .biz-footer-meta { display: flex; align-items: center; gap: 5px; color: var(--biz-mute); font-size: 9px; letter-spacing: .02em; }
   .biz-footer-meta strong { color: var(--biz-ink-2); font-weight: 700; }
   .biz-check { color: #059669; display: inline-flex; align-items: center; }
   .biz-check svg { width: 11px; height: 11px; }
@@ -1037,23 +1079,54 @@ const CARD_STYLES = `
     box-shadow: 0 18px 34px -18px rgba(15,23,42,.6);
   }
   @media (max-width: 420px) {
-    .biz {
-      align-items: flex-start;
-      padding: max(22px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
-    }
-    .biz-card { padding: 16px 16px 14px; border-radius: 28px; }
-    .biz-photo { width: 112px; height: 112px; }
-    .biz-head h1 { font-size: 26px; }
-    .biz-actions { gap: 8px; }
-    .biz-action { min-height: 48px; font-size: 11px; padding: 0 10px; }
-    .biz-tiles { gap: 8px; }
-    .biz-tile { border-radius: 14px; }
-    .biz-tile svg { width: 21px; height: 21px; }
-    .biz-vcard { gap: 13px; padding: 13px; }
-    .biz-qr { width: 120px; height: 120px; padding: 9px; border-radius: 16px; }
+    .biz-card { padding: max(14px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)); }
+    .biz-photo { width: 72px; height: 72px; }
+    .biz-initial { font-size: 27px; }
+    .biz-action { min-height: 40px; font-size: 11px; padding: 0 10px; }
+    .biz-tiles { gap: 10px 5px; }
+    .biz-tile svg { width: 32px; height: 32px; }
+    .biz-vcard { gap: 12px; padding: 12px; }
+    .biz-qr { width: 104px; height: 104px; padding: 8px; border-radius: 12px; }
   }
-  @media (max-width: 360px) {
-    .biz-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-height: 700px) {
+    .biz-card { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    .biz-photo { width: 62px; height: 62px; }
+    .biz-initial { font-size: 24px; }
+    .biz-head { padding-bottom: 10px; }
+    .biz-tagline { -webkit-line-clamp: 1; line-clamp: 1; }
+    .biz-actions { margin-bottom: 10px; }
+    .biz-action { min-height: 38px; }
+    .biz-social { padding: 10px 0 12px; }
+    .biz-tile svg { width: 28px; height: 28px; }
+    .biz-qr { width: 96px; height: 96px; }
+    .biz-vcard { margin: 10px 0 8px; }
+    .biz-footer { gap: 4px; }
+  }
+  @media (min-width: 720px) {
+    body {
+      background:
+        radial-gradient(900px 520px at 50% -10%, rgba(37,99,235,.10) 0%, transparent 60%),
+        var(--biz-bg);
+    }
+    body::before { display: none; }
+    .biz {
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .biz-card {
+      flex: 0 0 auto;
+      max-width: 460px;
+      min-height: 0;
+      padding: 22px 24px 20px;
+      border-radius: 32px;
+      border: 1px solid rgba(15,23,42,.07);
+      box-shadow: var(--biz-shadow);
+    }
+    .biz-photo { width: 88px; height: 88px; }
+    .biz-qr { width: 128px; height: 128px; }
+    .biz-tile svg { width: 36px; height: 36px; }
+    .biz-footer { margin-top: 0; }
   }
   @media (prefers-reduced-motion: no-preference) {
     .biz-head, .biz-actions, .biz-social, .biz-vcard, .biz-footer { animation: bizRise .55s cubic-bezier(.2,.8,.2,1) both; }
@@ -1133,6 +1206,7 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   const phone = contact.showPhone ? String(contact.phone || "").trim() : "";
   const email = contact.showEmail ? String(contact.email || "").trim() : "";
   const vcard = buildVCard({ name, headline, country, canonical, phone, email });
+  const qrSvg = buildQrSvg(canonical) || buildQrSvg(vcard);
   const pageTitle = `${name} - ${headline || "بطاقة أعمال رقمية"}`;
   const description = clampText(
     [name, headline, bio].filter(Boolean).join(" — ") || `بطاقة أعمال ${name}`,
@@ -1142,10 +1216,10 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   const year = new Date().getFullYear();
 
   const actionItems = [];
-  if (email) actionItems.push({ label: "Email Me", icon: "email", href: `mailto:${email}` });
-  if (phone) actionItems.push({ label: "Call Office", icon: "phone", href: `tel:${phone}` });
-  if (linkedin) actionItems.push({ label: "LinkedIn", icon: "linkedin", href: linkedin.target });
-  if (cvUrl) actionItems.push({ label: "Download CV", icon: "download", href: cvUrl });
+  if (email) actionItems.push({ label: "راسلني بالبريد", icon: "email", href: `mailto:${email}` });
+  if (phone) actionItems.push({ label: "اتصل بي", icon: "phone", href: `tel:${phone}` });
+  if (linkedin) actionItems.push({ label: "لينكدإن", icon: "linkedin", href: linkedin.target });
+  if (cvUrl) actionItems.push({ label: "تحميل السيرة الذاتية", icon: "download", href: cvUrl });
 
   const actionsHtml = actionItems.length
     ? actionItems
@@ -1161,14 +1235,15 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
       const subtitle = linkSubtitle(link);
       const title = subtitle ? `${link.label} — ${subtitle}` : link.label;
       const tileColor = link.dark ? "#111827" : link.color;
-      return `<a class="biz-tile" href="${escapeHtml(link.target)}" target="_blank" rel="noopener noreferrer" style="--tile:${escapeHtml(tileColor)}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}">${iconSvg(link.platform)}</a>`;
+      return `<a class="biz-tile" href="${escapeHtml(link.target)}" target="_blank" rel="noopener noreferrer" style="--tile:${escapeHtml(tileColor)}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}">${iconSvg(link.platform)}<span class="biz-tile-label">${escapeHtml(link.label)}</span></a>`;
     })
     .join("");
 
+  const tileColumns = Math.min(5, Math.max(3, socialLinks.length));
   const socialSection = socialLinks.length
     ? `<section class="biz-social">
-      <div class="biz-panel-head"><h2>Social Profiles</h2><span class="biz-count">${socialLinks.length}</span></div>
-      <div class="biz-tiles">${socialHtml}</div>
+      <div class="biz-panel-head"><h2>حسابات التواصل</h2><span class="biz-count">${socialLinks.length}</span></div>
+      <div class="biz-tiles" style="--cols:${tileColumns}">${socialHtml}</div>
     </section>`
     : "";
 
@@ -1180,13 +1255,11 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   const chipsHtml = `<div class="biz-chips">${chips.join("")}</div>`;
 
   const vcardSection = `<section class="biz-vcard" id="vcard">
-    <div class="biz-qr" id="qrCode" aria-label="باركود جهة الاتصال"></div>
+    <div class="biz-qr" aria-label="باركود البطاقة">${qrSvg || `<span class="biz-qr-fallback">تعذر عرض الباركود. استخدم زر التحميل.</span>`}</div>
     <div class="biz-vcard-copy">
-      <span class="biz-eyebrow">vCard · Digital Contact</span>
-      <h2>امسح لحفظ جهة الاتصال</h2>
-      <p>افتح الكاميرا وامسح الرمز لإضافة بياناتي إلى جهات اتصالك مباشرة.</p>
-      <button class="biz-vcard-btn" type="button" data-download-vcard>${iconSvg("download")}<span>تحميل vCard</span></button>
-      <span class="biz-vcard-note">Scan to save contact</span>
+      <h2>امسح الباركود لفتح البطاقة</h2>
+      <p>نفس الباركود الموجود في التطبيق — امسحه للوصول إلى صفحتي أو مشاركتها.</p>
+      <button class="biz-vcard-btn" type="button" data-download-vcard>${iconSvg("download")}<span>تحميل جهة الاتصال</span></button>
     </div>
   </section>`;
 
@@ -1214,15 +1287,19 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
         <button class="biz-top-action" type="button" data-share aria-label="مشاركة البطاقة">${iconSvg("share")}</button>
       </div>
       <header class="biz-head">
-        <div class="biz-photo">
-          <div class="biz-photo-inner">
-            <span class="biz-initial">${escapeHtml(initial)}</span>
-            ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}" loading="eager" onerror="this.remove()">` : ""}
+        <div class="biz-identity">
+          <div class="biz-photo">
+            <div class="biz-photo-inner">
+              <span class="biz-initial">${escapeHtml(initial)}</span>
+              ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}" loading="eager" onerror="this.remove()">` : ""}
+            </div>
+            <span class="biz-photo-badge" title="موثّق">${iconSvg("check")}</span>
           </div>
-          <span class="biz-photo-badge" title="موثّق">${iconSvg("check")}</span>
+          <div class="biz-identity-text">
+            <h1>${escapeHtml(name)}</h1>
+            <p class="biz-role" dir="auto">${escapeHtml(headline || "بطاقة أعمال رقمية")}</p>
+          </div>
         </div>
-        <h1>${escapeHtml(name)}</h1>
-        <p class="biz-role" dir="auto">${escapeHtml(headline || "بطاقة أعمال رقمية")}</p>
         ${bio ? `<p class="biz-tagline">${escapeHtml(bio)}</p>` : ""}
         ${chipsHtml}
       </header>
@@ -1242,8 +1319,7 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     fileName: `${String(name).replace(/[\\/:*?"<>|]+/g, "").trim().slice(0, 60) || "contact"}.vcf`
   });
 
-  const scripts = `<script src="/vendor/qrcode.js"></script>
-<script>
+  const scripts = `<script>
 (function () {
   var shareData = ${shareConfig};
   var toastEl = document.getElementById("toast");
@@ -1334,36 +1410,6 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     downloadButtons[k].addEventListener("click", downloadVcard);
   }
 
-  function renderQrValue(frame, value) {
-    var qr = qrcode(0, "M");
-    qr.addData(value, "Byte");
-    qr.make();
-    frame.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 0, scalable: true, alt: "باركود جهة الاتصال" });
-  }
-
-  function renderQr() {
-    var frame = document.getElementById("qrCode");
-    if (!frame) return;
-    if (typeof qrcode !== "function") {
-      frame.innerHTML = '<span class="biz-qr-fallback">تعذر عرض الباركود. استخدم زر التحميل.</span>';
-      return;
-    }
-    var candidates = [shareData.vcard, shareData.url];
-    for (var i = 0; i < candidates.length; i += 1) {
-      if (!candidates[i]) continue;
-      try {
-        renderQrValue(frame, candidates[i]);
-        return;
-      } catch (error) {}
-    }
-    frame.innerHTML = '<span class="biz-qr-fallback">تعذر عرض الباركود. استخدم زر التحميل.</span>';
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", renderQr);
-  } else {
-    renderQr();
-  }
 })();
 </script>`;
 
