@@ -1,3 +1,5 @@
-
 User-agent: *
+Allow: /
 Disallow: /api/
+
+Sitemap: https://my-social-qr-web.pages.dev/sitemap.xml
