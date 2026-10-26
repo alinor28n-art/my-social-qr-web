@@ -308,6 +308,7 @@ export function renderLink(link) {
   return {
     platform: link.platform,
     label,
+    customLabel: Boolean(String(link.label || "").trim()),
     target,
     color: meta.color,
     letter: meta.letter,
