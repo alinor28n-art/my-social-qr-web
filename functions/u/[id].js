@@ -57,6 +57,104 @@ const ICONS = {
     '<path d="M9.55 17.3 4.8 12.55l1.4-1.4 3.35 3.34 8.25-8.24 1.4 1.4z"/>'
 };
 
+const I18N = {
+  ar: {
+    digitalCard: "بطاقة أعمال رقمية",
+    verified: "موثّق",
+    emailMe: "راسلني بالبريد",
+    callMe: "اتصل بي",
+    linkedinAction: "لينكدإن",
+    downloadCv: "تحميل السيرة الذاتية",
+    shareCard: "مشاركة البطاقة",
+    socialAccounts: "حسابات التواصل",
+    scanBarcode: "امسح الباركود",
+    scanBarcodeDesc: "نفس الباركود الموجود في التطبيق — امسحه للوصول إلى صفحتي أو مشاركتها.",
+    downloadBarcode: "تحميل الباركود",
+    downloadContact: "تحميل جهة الاتصال",
+    qrAlt: "باركود البطاقة",
+    qrFallback: "تعذر عرض الباركود.",
+    barcode: "الباركود",
+    home: "الصفحة الرئيسية",
+    copyLink: "نسخ الرابط",
+    copied: "تم نسخ الرابط",
+    copyFailed: "تعذر نسخ الرابط",
+    contactDownloaded: "تم تنزيل بطاقة جهة الاتصال",
+    contactFailed: "تعذر تنزيل vCard",
+    barcodeDownloaded: "تم تنزيل الباركود",
+    barcodeFailed: "تعذر تنزيل الباركود",
+    barcodePreparing: "جارٍ تجهيز الباركود…",
+    scanHint: "وجّه الكاميرا نحو الباركود"
+  },
+  en: {
+    digitalCard: "Digital business card",
+    verified: "Verified",
+    emailMe: "Email me",
+    callMe: "Call me",
+    linkedinAction: "LinkedIn",
+    downloadCv: "Download CV",
+    shareCard: "Share card",
+    socialAccounts: "Social accounts",
+    scanBarcode: "Scan the barcode",
+    scanBarcodeDesc: "The same QR code from the app — scan it to open or share my page.",
+    downloadBarcode: "Download barcode",
+    downloadContact: "Download contact",
+    qrAlt: "Card barcode",
+    qrFallback: "Could not render the barcode.",
+    barcode: "Barcode",
+    home: "Home",
+    copyLink: "Copy link",
+    copied: "Link copied",
+    copyFailed: "Could not copy the link",
+    contactDownloaded: "Contact card downloaded",
+    contactFailed: "Could not download vCard",
+    barcodeDownloaded: "Barcode downloaded",
+    barcodeFailed: "Could not download the barcode",
+    barcodePreparing: "Preparing barcode…",
+    scanHint: "Point your camera at the barcode"
+  }
+};
+
+const PLATFORM_LABELS = {
+  ar: {
+    instagram: "إنستغرام",
+    facebook: "فيسبوك",
+    twitter: "إكس (تويتر)",
+    youtube: "يوتيوب",
+    whatsapp: "واتساب",
+    snapchat: "سناب شات",
+    tiktok: "تيك توك",
+    telegram: "تيليجرام",
+    linkedin: "لينكدإن",
+    github: "جيت هب",
+    threads: "ثريدز",
+    discord: "ديسكورد",
+    pinterest: "بينترست",
+    website: "موقع إلكتروني",
+    email: "بريد إلكتروني",
+    phone: "هاتف",
+    custom: "رابط"
+  },
+  en: {
+    instagram: "Instagram",
+    facebook: "Facebook",
+    twitter: "X (Twitter)",
+    youtube: "YouTube",
+    whatsapp: "WhatsApp",
+    snapchat: "Snapchat",
+    tiktok: "TikTok",
+    telegram: "Telegram",
+    linkedin: "LinkedIn",
+    github: "GitHub",
+    threads: "Threads",
+    discord: "Discord",
+    pinterest: "Pinterest",
+    website: "Website",
+    email: "Email",
+    phone: "Phone",
+    custom: "Link"
+  }
+};
+
 function iconSvg(platform) {
   const body = ICONS[platform] || ICONS.custom;
   return `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">${body}</svg>`;
@@ -113,8 +211,10 @@ function pageShell(title, content, options = {}) {
   const url = options.url || "";
   const robots = options.robots || "index, follow, max-image-preview:large, max-snippet:-1";
   const jsonLd = options.jsonLd || "";
+  const lang = options.lang === "en" ? "en" : "ar";
+  const dir = lang === "en" ? "ltr" : "rtl";
   return `<!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="${lang}" dir="${dir}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -123,11 +223,14 @@ ${description ? `<meta name="description" content="${escapeHtml(description)}">`
 <meta name="robots" content="${escapeHtml(robots)}">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#f3f4f6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 ${url ? `<link rel="canonical" href="${escapeHtml(url)}">` : ""}
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="My Social QR">
-<meta property="og:locale" content="ar_SA">
+<meta property="og:locale" content="${lang === "en" ? "en_US" : "ar_SA"}">
 <meta property="og:title" content="${escapeHtml(title)}">
 ${description ? `<meta property="og:description" content="${escapeHtml(description)}">` : ""}
 ${image ? `<meta property="og:image" content="${escapeHtml(image)}">` : ""}
@@ -160,7 +263,7 @@ ${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ""}
       radial-gradient(900px 480px at 50% -10%, rgba(37,99,235,.10) 0%, transparent 60%),
       var(--bg);
     color: var(--text);
-    font-family: "Segoe UI", "Noto Sans Arabic", "Noto Kufi Arabic", Tahoma, Arial, sans-serif;
+    font-family: "Noto Naskh Arabic", "Traditional Arabic", "Times New Roman", serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -666,7 +769,7 @@ const CARD_STYLES = `
       radial-gradient(720px 560px at 46% 108%, rgba(226,232,240,.95) 0%, rgba(226,232,240,0) 66%),
       var(--biz-bg);
     color: var(--biz-ink);
-    font-family: "Noto Kufi Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+    font-family: "Noto Naskh Arabic", "Traditional Arabic", "Times New Roman", serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -761,6 +864,37 @@ const CARD_STYLES = `
     box-shadow: 0 4px 10px -6px rgba(15,23,42,.8);
   }
   .biz-verified svg { width: 9px; height: 9px; }
+  .biz-top-actions { display: flex; align-items: center; gap: 8px; }
+  .biz-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid rgba(15,23,42,.08);
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 10px 20px -16px rgba(15,23,42,.5), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .biz-lang-option {
+    min-width: 32px;
+    height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--biz-soft);
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .biz-lang-option:hover { color: var(--biz-ink); }
+  .biz-lang-option.is-active {
+    background: #111827;
+    color: #fff;
+    box-shadow: 0 8px 16px -10px rgba(15,23,42,.8);
+  }
   .biz-top-action {
     width: 34px;
     height: 34px;
@@ -778,36 +912,35 @@ const CARD_STYLES = `
   .biz-top-action:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 14px 24px -16px rgba(15,23,42,.5), inset 0 1px 0 #fff; }
   .biz-top-action:active { transform: scale(.97); }
   .biz-top-action svg { width: 17px; height: 17px; }
-  .biz-head { padding: 0 2px 14px; }
-  .biz-identity {
+  .biz-head {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 14px;
-    text-align: start;
+    padding: 6px 2px 18px;
+    text-align: center;
   }
-  .biz-identity-text { flex: 1 1 auto; min-width: 0; }
   .biz-photo {
     position: relative;
     flex: 0 0 auto;
-    width: 78px;
-    height: 78px;
-    margin: 0;
-    padding: 4px;
+    width: 112px;
+    height: 112px;
+    margin: 0 auto;
+    padding: 5px;
     border-radius: 50%;
-    background: linear-gradient(145deg, #f8fafc 0%, #e5e7eb 100%);
+    background: linear-gradient(145deg, #ffffff 0%, #e8edf6 100%);
     box-shadow:
-      0 16px 30px -20px rgba(15,23,42,.5),
-      0 6px 14px -12px rgba(15,23,42,.2),
+      0 24px 44px -26px rgba(15,23,42,.55),
+      0 8px 18px -14px rgba(15,23,42,.24),
       inset 0 1px 1px rgba(255,255,255,.98),
-      inset 0 -3px 8px rgba(148,163,184,.2);
+      inset 0 -3px 8px rgba(148,163,184,.22);
   }
   .biz-photo::before {
     content: "";
     position: absolute;
     inset: 2px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,.9);
-    box-shadow: inset 0 2px 7px rgba(148,163,184,.22);
+    border: 1px solid rgba(255,255,255,.95);
+    box-shadow: inset 0 2px 8px rgba(148,163,184,.24);
     pointer-events: none;
   }
   .biz-photo-inner {
@@ -819,17 +952,17 @@ const CARD_STYLES = `
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #111827 0%, #4b5563 100%);
+    background: linear-gradient(135deg, #1e40af 0%, #4f46e5 100%);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
   }
   .biz-photo-inner img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .biz-initial { color: #fff; font-size: 30px; font-weight: 800; line-height: 1; text-shadow: 0 4px 14px rgba(0,0,0,.24); }
+  .biz-initial { color: #fff; font-size: 40px; font-weight: 800; line-height: 1; text-shadow: 0 4px 14px rgba(0,0,0,.24); }
   .biz-photo-badge {
     position: absolute;
-    inset-inline-end: 2px;
-    bottom: 2px;
-    width: 22px;
-    height: 22px;
+    inset-inline-end: 4px;
+    bottom: 4px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
@@ -839,42 +972,44 @@ const CARD_STYLES = `
     border: 2px solid #f8fafc;
     box-shadow: 0 6px 12px -8px rgba(15,23,42,.65);
   }
-  .biz-photo-badge svg { width: 9px; height: 9px; }
+  .biz-photo-badge svg { width: 10px; height: 10px; }
   .biz-head h1 {
-    margin: 0;
+    margin: 18px 0 0;
     color: var(--biz-ink);
-    font-size: clamp(20px, 5.6vw, 25px);
-    line-height: 1.2;
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.22;
     font-weight: 800;
     letter-spacing: -.4px;
-    text-align: start;
+    text-align: center;
+    max-width: 100%;
     overflow-wrap: anywhere;
   }
   .biz-role {
-    margin: 3px 0 0;
+    margin: 5px 0 0;
+    max-width: 42ch;
     color: var(--biz-soft);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    letter-spacing: .02em;
-    text-align: start;
+    letter-spacing: .01em;
+    text-align: center;
     overflow-wrap: anywhere;
   }
   .biz-tagline {
-    max-width: none;
-    margin: 8px 0 0;
+    max-width: 46ch;
+    margin: 12px auto 0;
     color: var(--biz-soft);
-    font-size: 11.5px;
-    line-height: 1.65;
+    font-size: 12.5px;
+    line-height: 1.8;
     text-align: center;
     white-space: pre-line;
     overflow-wrap: anywhere;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     overflow: hidden;
   }
-  .biz-chips { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
+  .biz-chips { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; }
   .biz-chip {
     display: inline-flex;
     align-items: center;
@@ -938,16 +1073,29 @@ const CARD_STYLES = `
     border-top: 1px solid var(--biz-line);
     border-bottom: 1px solid var(--biz-line);
   }
-  .biz-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .biz-panel-head { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; }
   .biz-panel-head h2 { margin: 0; color: var(--biz-ink-2); font-size: 10.5px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-  .biz-count { color: var(--biz-mute); font-size: 10px; font-weight: 700; }
-  .biz-tiles { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 12px 6px; }
+  .biz-count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(37,99,235,.10);
+    color: #1d4ed8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .biz-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 10px; }
   .biz-tile {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     gap: 5px;
+    width: 68px;
     padding: 2px;
     border-radius: 12px;
     background: transparent;
@@ -970,58 +1118,71 @@ const CARD_STYLES = `
     text-overflow: ellipsis;
   }
   .biz-empty { margin: 0; padding: 16px; border-radius: 16px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.85); color: var(--biz-mute); font-size: 11px; text-align: center; }
-  .biz-vcard {
+  .biz-qr-section {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin: 14px 0 12px;
-    padding: 14px;
-    border-radius: 18px;
-    background: #f7f9fc;
-    border: 1px solid var(--biz-line);
-    box-shadow: none;
+    text-align: center;
+    margin: 16px 0 14px;
+    padding: 22px 18px 20px;
+    border-radius: 22px;
+    background:
+      radial-gradient(360px 180px at 50% -40px, rgba(37,99,235,.14), rgba(37,99,235,0) 70%),
+      linear-gradient(180deg, #f8faff 0%, #f2f6ff 100%);
+    border: 1px solid rgba(37,99,235,.10);
   }
+  .biz-qr-eyebrow { color: var(--biz-mute); font-size: 9px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
+  .biz-qr-title { margin: 6px 0 16px; color: var(--biz-ink); font-size: 17px; line-height: 1.3; font-weight: 800; letter-spacing: -.2px; }
   .biz-qr {
     flex: 0 0 auto;
-    width: 118px;
-    height: 118px;
-    padding: 9px;
-    border-radius: 14px;
+    width: 196px;
+    height: 196px;
+    padding: 13px;
+    border-radius: 20px;
     background: #fff;
-    border: 1px solid var(--biz-line);
+    border: 1px solid rgba(15,23,42,.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 14px 28px -24px rgba(15,23,42,.55);
+    box-shadow: 0 26px 50px -32px rgba(15,23,42,.6), 0 0 0 6px rgba(255,255,255,.72);
   }
   .biz-qr svg { width: 100%; height: 100%; display: block; }
-  .biz-qr svg path { fill: #0f172a; }
-  .biz-qr-fallback { color: var(--biz-mute); font-size: 10px; line-height: 1.6; text-align: center; }
-  .biz-vcard-copy { flex: 1 1 180px; min-width: 0; }
-  .biz-eyebrow { color: var(--biz-mute); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
-  .biz-vcard-copy h2 { margin: 0 0 4px; color: var(--biz-ink); font-size: 14px; line-height: 1.35; letter-spacing: -.2px; }
-  .biz-vcard-copy p { margin: 0; color: var(--biz-soft); font-size: 10.5px; line-height: 1.55; }
-  .biz-vcard-btn {
+  .biz-qr svg path { fill: #0b1220; }
+  .biz-qr-fallback { max-width: 120px; color: var(--biz-mute); font-size: 10px; line-height: 1.6; text-align: center; }
+  .biz-qr-desc { max-width: 40ch; margin: 16px auto 0; color: var(--biz-soft); font-size: 11.5px; line-height: 1.75; }
+  .biz-qr-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; width: 100%; }
+  .biz-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding: 7px 12px;
-    border: 0;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 16px;
     border-radius: 999px;
-    background: #111827;
-    color: #fff;
-    font-size: 10.5px;
-    font-weight: 700;
+    border: 1px solid transparent;
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 12px 22px -14px rgba(17,24,39,.85), inset 0 1px 0 rgba(255,255,255,.2);
-    transition: transform .18s ease, box-shadow .18s ease;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, filter .18s ease;
   }
-  .biz-vcard-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 26px -14px rgba(17,24,39,.9), inset 0 1px 0 rgba(255,255,255,.24); }
-  .biz-vcard-btn svg { width: 13px; height: 13px; }
-  .biz-vcard-note { display: none; }
+  .biz-btn svg { width: 15px; height: 15px; flex: 0 0 auto; }
+  .biz-btn-primary {
+    background: linear-gradient(145deg, #1e40af 0%, #1d4ed8 55%, #4f46e5 100%);
+    color: #fff;
+    box-shadow: 0 18px 30px -18px rgba(29,78,216,.85), inset 0 1px 0 rgba(255,255,255,.22);
+  }
+  .biz-btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  .biz-btn-primary:active { transform: scale(.98); }
+  .biz-btn-soft {
+    background: #fff;
+    border-color: rgba(15,23,42,.12);
+    color: var(--biz-ink-2);
+    box-shadow: 0 12px 22px -20px rgba(15,23,42,.55), inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  .biz-btn-soft:hover { transform: translateY(-1px); background: #f6f9ff; }
+  .biz-btn-soft:active { transform: scale(.98); }
   .biz-footer { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: auto; padding-top: 2px; }
   .biz-footer-icons { display: flex; align-items: center; gap: 7px; }
   .biz-footer-icon {
@@ -1080,26 +1241,34 @@ const CARD_STYLES = `
   }
   @media (max-width: 420px) {
     .biz-card { padding: max(14px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)); }
-    .biz-photo { width: 72px; height: 72px; }
-    .biz-initial { font-size: 27px; }
+    .biz-brand { font-size: 8.5px; letter-spacing: .14em; }
+    .biz-lang-option { min-width: 30px; padding: 0 7px; font-size: 10px; }
+    .biz-photo { width: 96px; height: 96px; }
+    .biz-initial { font-size: 34px; }
+    .biz-head h1 { margin-top: 15px; }
     .biz-action { min-height: 40px; font-size: 11px; padding: 0 10px; }
-    .biz-tiles { gap: 10px 5px; }
+    .biz-tiles { gap: 12px 6px; }
+    .biz-tile { width: 62px; }
     .biz-tile svg { width: 32px; height: 32px; }
-    .biz-vcard { gap: 12px; padding: 12px; }
-    .biz-qr { width: 104px; height: 104px; padding: 8px; border-radius: 12px; }
+    .biz-qr-section { padding: 20px 14px 18px; }
+    .biz-qr { width: 176px; height: 176px; padding: 11px; border-radius: 18px; }
+    .biz-qr-actions .biz-btn { flex: 1 1 auto; }
   }
   @media (max-height: 700px) {
     .biz-card { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-    .biz-photo { width: 62px; height: 62px; }
-    .biz-initial { font-size: 24px; }
-    .biz-head { padding-bottom: 10px; }
-    .biz-tagline { -webkit-line-clamp: 1; line-clamp: 1; }
+    .biz-photo { width: 86px; height: 86px; }
+    .biz-initial { font-size: 30px; }
+    .biz-head { padding-bottom: 12px; }
+    .biz-head h1 { margin-top: 12px; }
+    .biz-tagline { -webkit-line-clamp: 2; line-clamp: 2; }
     .biz-actions { margin-bottom: 10px; }
     .biz-action { min-height: 38px; }
     .biz-social { padding: 10px 0 12px; }
     .biz-tile svg { width: 28px; height: 28px; }
-    .biz-qr { width: 96px; height: 96px; }
-    .biz-vcard { margin: 10px 0 8px; }
+    .biz-qr-section { margin: 12px 0 10px; padding: 16px 14px 14px; }
+    .biz-qr-title { margin-bottom: 12px; font-size: 15.5px; }
+    .biz-qr { width: 150px; height: 150px; }
+    .biz-qr-desc { margin-top: 12px; }
     .biz-footer { gap: 4px; }
   }
   @media (min-width: 720px) {
@@ -1116,23 +1285,25 @@ const CARD_STYLES = `
     }
     .biz-card {
       flex: 0 0 auto;
-      max-width: 460px;
+      max-width: 480px;
       min-height: 0;
-      padding: 22px 24px 20px;
-      border-radius: 32px;
+      padding: 24px 26px 22px;
+      border-radius: 34px;
       border: 1px solid rgba(15,23,42,.07);
       box-shadow: var(--biz-shadow);
     }
-    .biz-photo { width: 88px; height: 88px; }
-    .biz-qr { width: 128px; height: 128px; }
+    .biz-photo { width: 124px; height: 124px; }
+    .biz-initial { font-size: 44px; }
+    .biz-qr { width: 210px; height: 210px; padding: 14px; }
+    .biz-qr-section { padding: 24px 20px 22px; }
     .biz-tile svg { width: 36px; height: 36px; }
     .biz-footer { margin-top: 0; }
   }
   @media (prefers-reduced-motion: no-preference) {
-    .biz-head, .biz-actions, .biz-social, .biz-vcard, .biz-footer { animation: bizRise .55s cubic-bezier(.2,.8,.2,1) both; }
+    .biz-head, .biz-actions, .biz-social, .biz-qr-section, .biz-footer { animation: bizRise .55s cubic-bezier(.2,.8,.2,1) both; }
     .biz-actions { animation-delay: .05s; }
     .biz-social { animation-delay: .09s; }
-    .biz-vcard { animation-delay: .13s; }
+    .biz-qr-section { animation-delay: .13s; }
     .biz-footer { animation-delay: .17s; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1183,7 +1354,7 @@ function errorPage(status, title, message) {
   });
 }
 
-function renderBusinessCard({ record, origin, canonical, name, initial, country }) {
+function renderBusinessCard({ record, origin, canonical, name, initial, country, lang }) {
   const resolveUrl = (value) => {
     const raw = String(value || "").trim();
     if (!raw) return "";
@@ -1207,43 +1378,55 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   const email = contact.showEmail ? String(contact.email || "").trim() : "";
   const vcard = buildVCard({ name, headline, country, canonical, phone, email });
   const qrSvg = buildQrSvg(canonical) || buildQrSvg(vcard);
-  const pageTitle = `${name} - ${headline || "بطاقة أعمال رقمية"}`;
+  const requestedLang = String(lang || "").toLowerCase();
+  const locale =
+    requestedLang.startsWith("en") || requestedLang.startsWith("ar")
+      ? requestedLang
+      : String(record.locale || "").toLowerCase();
+  const startLang = locale.startsWith("en") ? "en" : "ar";
+  const fallbackRole = startLang === "en" ? "Digital business card" : "بطاقة أعمال رقمية";
+  const tr = (key) => (I18N[startLang] || I18N.ar)[key] || I18N.ar[key] || "";
+  const pageTitle = `${name} - ${headline || fallbackRole}`;
   const description = clampText(
-    [name, headline, bio].filter(Boolean).join(" — ") || `بطاقة أعمال ${name}`,
+    [name, headline, bio].filter(Boolean).join(" — ") ||
+      (startLang === "en" ? `Business card of ${name}` : `بطاقة أعمال ${name}`),
     160
   );
   const shareImage = avatar || cover;
   const year = new Date().getFullYear();
 
   const actionItems = [];
-  if (email) actionItems.push({ label: "راسلني بالبريد", icon: "email", href: `mailto:${email}` });
-  if (phone) actionItems.push({ label: "اتصل بي", icon: "phone", href: `tel:${phone}` });
-  if (linkedin) actionItems.push({ label: "لينكدإن", icon: "linkedin", href: linkedin.target });
-  if (cvUrl) actionItems.push({ label: "تحميل السيرة الذاتية", icon: "download", href: cvUrl });
+  if (email) actionItems.push({ key: "emailMe", icon: "email", href: `mailto:${email}` });
+  if (phone) actionItems.push({ key: "callMe", icon: "phone", href: `tel:${phone}` });
+  if (linkedin) actionItems.push({ key: "linkedinAction", icon: "linkedin", href: linkedin.target });
+  if (cvUrl) actionItems.push({ key: "downloadCv", icon: "download", href: cvUrl });
 
   const actionsHtml = actionItems.length
     ? actionItems
         .map((item) => {
           const external = /^https?:\/\//i.test(item.href);
-          return `<a class="biz-action" href="${escapeHtml(item.href)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>${iconSvg(item.icon)}<span>${escapeHtml(item.label)}</span></a>`;
+          return `<a class="biz-action" href="${escapeHtml(item.href)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>${iconSvg(item.icon)}<span data-i18n="${item.key}">${escapeHtml(tr(item.key))}</span></a>`;
         })
         .join("")
-    : `<button class="biz-action" type="button" data-share>${iconSvg("share")}<span>مشاركة البطاقة</span></button>`;
+    : `<button class="biz-action" type="button" data-share>${iconSvg("share")}<span data-i18n="shareCard">${escapeHtml(tr("shareCard"))}</span></button>`;
 
   const socialHtml = socialLinks
     .map((link) => {
       const subtitle = linkSubtitle(link);
-      const title = subtitle ? `${link.label} — ${subtitle}` : link.label;
+      const displayLabel = link.customLabel
+        ? link.label
+        : (PLATFORM_LABELS[startLang] || PLATFORM_LABELS.ar)[link.platform] || link.label;
+      const title = subtitle ? `${displayLabel} — ${subtitle}` : displayLabel;
       const tileColor = link.dark ? "#111827" : link.color;
-      return `<a class="biz-tile" href="${escapeHtml(link.target)}" target="_blank" rel="noopener noreferrer" style="--tile:${escapeHtml(tileColor)}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}">${iconSvg(link.platform)}<span class="biz-tile-label">${escapeHtml(link.label)}</span></a>`;
+      const labelAttr = link.customLabel ? "" : ` data-platform="${escapeHtml(link.platform)}"`;
+      return `<a class="biz-tile" href="${escapeHtml(link.target)}" target="_blank" rel="noopener noreferrer" style="--tile:${escapeHtml(tileColor)}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}" data-subtitle="${escapeHtml(subtitle)}">${iconSvg(link.platform)}<span class="biz-tile-label"${labelAttr}>${escapeHtml(displayLabel)}</span></a>`;
     })
     .join("");
 
-  const tileColumns = Math.min(5, Math.max(3, socialLinks.length));
   const socialSection = socialLinks.length
     ? `<section class="biz-social">
-      <div class="biz-panel-head"><h2>حسابات التواصل</h2><span class="biz-count">${socialLinks.length}</span></div>
-      <div class="biz-tiles" style="--cols:${tileColumns}">${socialHtml}</div>
+      <div class="biz-panel-head"><h2 data-i18n="socialAccounts">${escapeHtml(tr("socialAccounts"))}</h2><span class="biz-count">${socialLinks.length}</span></div>
+      <div class="biz-tiles">${socialHtml}</div>
     </section>`
     : "";
 
@@ -1251,28 +1434,30 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   if (country) {
     chips.push(`<span class="biz-chip">${iconSvg("location")}<span>${escapeHtml(country)}</span></span>`);
   }
-  chips.push(`<span class="biz-chip is-verified">${iconSvg("check")}<span>موثّق</span></span>`);
+  chips.push(`<span class="biz-chip is-verified">${iconSvg("check")}<span data-i18n="verified">${escapeHtml(tr("verified"))}</span></span>`);
   const chipsHtml = `<div class="biz-chips">${chips.join("")}</div>`;
 
-  const vcardSection = `<section class="biz-vcard" id="vcard">
-    <div class="biz-qr" aria-label="باركود البطاقة">${qrSvg || `<span class="biz-qr-fallback">تعذر عرض الباركود. استخدم زر التحميل.</span>`}</div>
-    <div class="biz-vcard-copy">
-      <h2>امسح الباركود لفتح البطاقة</h2>
-      <p>نفس الباركود الموجود في التطبيق — امسحه للوصول إلى صفحتي أو مشاركتها.</p>
-      <button class="biz-vcard-btn" type="button" data-download-vcard>${iconSvg("download")}<span>تحميل جهة الاتصال</span></button>
+  const vcardSection = `<section class="biz-qr-section" id="vcard">
+    <span class="biz-qr-eyebrow">QR CODE</span>
+    <h2 class="biz-qr-title" data-i18n="scanBarcode">${escapeHtml(tr("scanBarcode"))}</h2>
+    <div class="biz-qr" aria-label="${escapeHtml(tr("qrAlt"))}" data-i18n-aria="qrAlt">${qrSvg || `<span class="biz-qr-fallback" data-i18n="qrFallback">${escapeHtml(tr("qrFallback"))}</span>`}</div>
+    <p class="biz-qr-desc" data-i18n="scanBarcodeDesc">${escapeHtml(tr("scanBarcodeDesc"))}</p>
+    <div class="biz-qr-actions">
+      ${qrSvg ? `<button class="biz-btn biz-btn-primary" type="button" data-download-qr>${iconSvg("download")}<span data-i18n="downloadBarcode">${escapeHtml(tr("downloadBarcode"))}</span></button>` : ""}
+      <button class="biz-btn biz-btn-soft" type="button" data-download-vcard>${iconSvg("download")}<span data-i18n="downloadContact">${escapeHtml(tr("downloadContact"))}</span></button>
     </div>
   </section>`;
 
   const footer = `<footer class="biz-footer">
     <div class="biz-footer-icons">
-      <a class="biz-footer-icon" href="#vcard" aria-label="الباركود">${iconSvg("qr")}</a>
-      <button class="biz-footer-icon" type="button" data-share aria-label="مشاركة البطاقة">${iconSvg("share")}</button>
-      <button class="biz-footer-icon" type="button" data-copy aria-label="نسخ الرابط">${iconSvg("copy")}</button>
-      <a class="biz-footer-icon" href="/" aria-label="الصفحة الرئيسية">${iconSvg("website")}</a>
+      <a class="biz-footer-icon" href="#vcard" aria-label="${escapeHtml(tr("barcode"))}" data-i18n-aria="barcode">${iconSvg("qr")}</a>
+      <button class="biz-footer-icon" type="button" data-share aria-label="${escapeHtml(tr("shareCard"))}" data-i18n-aria="shareCard">${iconSvg("share")}</button>
+      <button class="biz-footer-icon" type="button" data-copy aria-label="${escapeHtml(tr("copyLink"))}" data-i18n-aria="copyLink">${iconSvg("copy")}</button>
+      <a class="biz-footer-icon" href="/" aria-label="${escapeHtml(tr("home"))}" data-i18n-aria="home">${iconSvg("website")}</a>
     </div>
     <div class="biz-footer-meta">
       <span class="biz-check">${iconSvg("check")}</span>
-      <span>موثّق · © ${year} <strong>My Social QR</strong></span>
+      <span><span data-i18n="verified">${escapeHtml(tr("verified"))}</span> · © ${year} <strong>My Social QR</strong></span>
     </div>
   </footer>`;
 
@@ -1284,23 +1469,25 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
           <span>My Social QR</span>
           <span class="biz-verified">${iconSvg("check")}</span>
         </div>
-        <button class="biz-top-action" type="button" data-share aria-label="مشاركة البطاقة">${iconSvg("share")}</button>
+        <div class="biz-top-actions">
+          <div class="biz-lang" role="group" aria-label="Language / اللغة">
+            <button class="biz-lang-option${startLang === "ar" ? " is-active" : ""}" type="button" data-set-lang="ar" lang="ar" aria-label="العربية" aria-pressed="${startLang === "ar" ? "true" : "false"}">عربي</button>
+            <button class="biz-lang-option${startLang === "en" ? " is-active" : ""}" type="button" data-set-lang="en" lang="en" aria-label="English" aria-pressed="${startLang === "en" ? "true" : "false"}">EN</button>
+          </div>
+          <button class="biz-top-action" type="button" data-share aria-label="${escapeHtml(tr("shareCard"))}" data-i18n-aria="shareCard">${iconSvg("share")}</button>
+        </div>
       </div>
       <header class="biz-head">
-        <div class="biz-identity">
-          <div class="biz-photo">
-            <div class="biz-photo-inner">
-              <span class="biz-initial">${escapeHtml(initial)}</span>
-              ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}" loading="eager" onerror="this.remove()">` : ""}
-            </div>
-            <span class="biz-photo-badge" title="موثّق">${iconSvg("check")}</span>
+        <div class="biz-photo">
+          <div class="biz-photo-inner">
+            <span class="biz-initial">${escapeHtml(initial)}</span>
+            ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}" loading="eager" onerror="this.remove()">` : ""}
           </div>
-          <div class="biz-identity-text">
-            <h1>${escapeHtml(name)}</h1>
-            <p class="biz-role" dir="auto">${escapeHtml(headline || "بطاقة أعمال رقمية")}</p>
-          </div>
+          <span class="biz-photo-badge" title="${escapeHtml(tr("verified"))}" data-i18n-title="verified">${iconSvg("check")}</span>
         </div>
-        ${bio ? `<p class="biz-tagline">${escapeHtml(bio)}</p>` : ""}
+        <h1 dir="auto">${escapeHtml(name)}</h1>
+        <p class="biz-role" dir="auto"${headline ? "" : ' data-i18n="digitalCard"'}>${escapeHtml(headline || fallbackRole)}</p>
+        ${bio ? `<p class="biz-tagline" dir="auto">${escapeHtml(bio)}</p>` : ""}
         ${chipsHtml}
       </header>
       <section class="biz-actions">${actionsHtml}</section>
@@ -1311,19 +1498,33 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     <div class="biz-toast" id="toast" role="status" aria-live="polite"></div>
   </div>`;
 
+  const safeName =
+    String(name).replace(/[\\/:*?"<>|]+/g, "").trim().slice(0, 60) || "contact";
+
   const shareConfig = jsonLdScript({
-    title: `${name} - ${headline || "بطاقة أعمال رقمية"}`,
-    text: `بطاقة ${name}${headline ? ` — ${headline}` : ""}`,
+    name,
+    headline,
     url: canonical,
     vcard,
-    fileName: `${String(name).replace(/[\\/:*?"<>|]+/g, "").trim().slice(0, 60) || "contact"}.vcf`
+    fileName: `${safeName}.vcf`,
+    qrFileName: `${safeName}-barcode.png`
   });
 
   const scripts = `<script>
 (function () {
   var shareData = ${shareConfig};
+  var I18N = ${jsonLdScript(I18N)};
+  var PLATFORM_LABELS = ${jsonLdScript(PLATFORM_LABELS)};
+  var startLang = ${JSON.stringify(startLang)};
+  var currentLang = startLang;
   var toastEl = document.getElementById("toast");
   var toastTimer = null;
+  var langButtons = document.querySelectorAll("[data-set-lang]");
+
+  function t(key) {
+    var dict = I18N[currentLang] || I18N.ar;
+    return dict[key] || (I18N.ar[key] || "");
+  }
 
   function showToast(message) {
     if (!toastEl) return;
@@ -1331,6 +1532,70 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     toastEl.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2600);
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang === "en" ? "en" : "ar";
+    var dict = I18N[currentLang] || I18N.ar;
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for (var i = 0; i < nodes.length; i += 1) {
+      var key = nodes[i].getAttribute("data-i18n");
+      if (dict[key]) nodes[i].textContent = dict[key];
+    }
+
+    var ariaNodes = document.querySelectorAll("[data-i18n-aria]");
+    for (var j = 0; j < ariaNodes.length; j += 1) {
+      var ariaKey = ariaNodes[j].getAttribute("data-i18n-aria");
+      if (dict[ariaKey]) ariaNodes[j].setAttribute("aria-label", dict[ariaKey]);
+    }
+
+    var titleNodes = document.querySelectorAll("[data-i18n-title]");
+    for (var m = 0; m < titleNodes.length; m += 1) {
+      var titleKey = titleNodes[m].getAttribute("data-i18n-title");
+      if (dict[titleKey]) titleNodes[m].setAttribute("title", dict[titleKey]);
+    }
+
+    var platformLabels = PLATFORM_LABELS[currentLang] || PLATFORM_LABELS.ar;
+    var platformNodes = document.querySelectorAll("[data-platform]");
+    for (var k = 0; k < platformNodes.length; k += 1) {
+      var platform = platformNodes[k].getAttribute("data-platform");
+      var platformLabel = platformLabels[platform];
+      if (!platformLabel) continue;
+      platformNodes[k].textContent = platformLabel;
+      var tile = platformNodes[k].closest(".biz-tile");
+      if (tile) {
+        var subtitle = tile.getAttribute("data-subtitle") || "";
+        var fullLabel = subtitle ? platformLabel + " — " + subtitle : platformLabel;
+        tile.setAttribute("title", fullLabel);
+        tile.setAttribute("aria-label", fullLabel);
+      }
+    }
+
+    for (var b = 0; b < langButtons.length; b += 1) {
+      var activeButton = langButtons[b].getAttribute("data-set-lang") === currentLang;
+      langButtons[b].setAttribute("aria-pressed", activeButton ? "true" : "false");
+      if (activeButton) {
+        langButtons[b].classList.add("is-active");
+      } else {
+        langButtons[b].classList.remove("is-active");
+      }
+    }
+
+    document.title = shareData.name + " - " + (shareData.headline || t("digitalCard"));
+
+    try { localStorage.setItem("msqr-lang", currentLang); } catch (error) {}
+  }
+
+  function chooseInitialLanguage() {
+    var fromQuery = "";
+    var saved = "";
+    try { fromQuery = new URLSearchParams(window.location.search).get("lang") || ""; } catch (error) {}
+    try { saved = localStorage.getItem("msqr-lang") || ""; } catch (error) {}
+    var lang = String(fromQuery || saved || startLang || "ar").toLowerCase();
+    return lang.indexOf("en") === 0 ? "en" : "ar";
   }
 
   function legacyCopy(text) {
@@ -1361,13 +1626,17 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
 
   function copyLink() {
     copyText(shareData.url)
-      .then(function () { showToast("تم نسخ الرابط"); })
-      .catch(function () { showToast("تعذر نسخ الرابط"); });
+      .then(function () { showToast(t("copied")); })
+      .catch(function () { showToast(t("copyFailed")); });
   }
 
   function sharePage() {
+    var title = shareData.name + (shareData.headline ? " — " + shareData.headline : "");
+    var text = currentLang === "en"
+      ? "Business card of " + shareData.name + (shareData.headline ? " — " + shareData.headline : "")
+      : "بطاقة " + shareData.name + (shareData.headline ? " — " + shareData.headline : "");
     if (navigator.share) {
-      navigator.share({ title: shareData.title, text: shareData.text, url: shareData.url }).catch(function (error) {
+      navigator.share({ title: title, text: text, url: shareData.url }).catch(function (error) {
         if (error && error.name === "AbortError") return;
         copyLink();
       });
@@ -1376,25 +1645,100 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     }
   }
 
+  function downloadBlob(blob, fileName) {
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
   function downloadVcard() {
     if (!shareData.vcard) {
-      showToast("تعذر تجهيز جهة الاتصال");
+      showToast(t("contactFailed"));
       return;
     }
     try {
       var blob = new Blob([shareData.vcard], { type: "text/vcard;charset=utf-8" });
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement("a");
-      link.href = url;
-      link.download = shareData.fileName || "contact.vcf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-      showToast("تم تنزيل بطاقة جهة الاتصال");
+      downloadBlob(blob, shareData.fileName || "contact.vcf");
+      showToast(t("contactDownloaded"));
     } catch (error) {
-      showToast("تعذر تنزيل vCard");
+      showToast(t("contactFailed"));
     }
+  }
+
+  function downloadBarcode() {
+    var svg = document.querySelector(".biz-qr svg");
+    if (!svg) {
+      showToast(t("barcodeFailed"));
+      return;
+    }
+    showToast(t("barcodePreparing"));
+    var clone = svg.cloneNode(true);
+    var box = (clone.getAttribute("viewBox") || "0 0 300 300").split(/\\s+/);
+    var size = parseFloat(box[2]) || 300;
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.setAttribute("width", String(size));
+    clone.setAttribute("height", String(size));
+    var serialized = new XMLSerializer().serializeToString(clone);
+    var svgBlob = new Blob([serialized], { type: "image/svg+xml;charset=utf-8" });
+    var fallbackName = String(shareData.qrFileName || "barcode.png").replace(/\\.png$/i, ".svg");
+    var url = URL.createObjectURL(svgBlob);
+    var img = new Image();
+
+    img.onload = function () {
+      try {
+        var target = 1024;
+        var canvas = document.createElement("canvas");
+        canvas.width = target;
+        canvas.height = target;
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, target, target);
+        ctx.drawImage(img, 0, 0, target, target);
+        URL.revokeObjectURL(url);
+        if (canvas.toBlob) {
+          canvas.toBlob(function (blob) {
+            if (blob) {
+              downloadBlob(blob, shareData.qrFileName || "barcode.png");
+            } else {
+              downloadBlob(svgBlob, fallbackName);
+            }
+            showToast(t("barcodeDownloaded"));
+          }, "image/png");
+        } else {
+          var dataUrl = canvas.toDataURL("image/png");
+          var link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = shareData.qrFileName || "barcode.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast(t("barcodeDownloaded"));
+        }
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        downloadBlob(svgBlob, fallbackName);
+        showToast(t("barcodeDownloaded"));
+      }
+    };
+
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      downloadBlob(svgBlob, fallbackName);
+      showToast(t("barcodeDownloaded"));
+    };
+
+    img.src = url;
+  }
+
+  for (var q = 0; q < langButtons.length; q += 1) {
+    langButtons[q].addEventListener("click", function () {
+      applyLanguage(this.getAttribute("data-set-lang"));
+    });
   }
 
   var shareButtons = document.querySelectorAll("[data-share]");
@@ -1409,7 +1753,12 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
   for (var k = 0; k < downloadButtons.length; k += 1) {
     downloadButtons[k].addEventListener("click", downloadVcard);
   }
+  var barcodeButtons = document.querySelectorAll("[data-download-qr]");
+  for (var n = 0; n < barcodeButtons.length; n += 1) {
+    barcodeButtons[n].addEventListener("click", downloadBarcode);
+  }
 
+  applyLanguage(chooseInitialLanguage());
 })();
 </script>`;
 
@@ -1428,7 +1777,7 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     url: canonical,
     name: pageTitle,
     description,
-    inLanguage: record.locale || "ar",
+    inLanguage: startLang,
     isPartOf: {
       "@type": "WebSite",
       name: "My Social QR",
@@ -1451,7 +1800,8 @@ function renderBusinessCard({ record, origin, canonical, name, initial, country 
     description,
     image: shareImage,
     url: canonical,
-    jsonLd
+    jsonLd,
+    lang: startLang
   }), {
     headers: {
       "content-type": "text/html; charset=utf-8",
@@ -1474,11 +1824,15 @@ export async function onRequestGet({ params, request, env }) {
     return errorPage(403, "هذه الصفحة غير متاحة", "قام صاحب البطاقة بتعطيلها مؤقتاً.");
   }
 
-  const origin = new URL(request.url).origin;
+  const url = new URL(request.url);
+  const origin = url.origin;
   const canonical = `${origin}/u/${id}`;
-  const name = (record.name || "").trim() || "بطاقة شخصية";
+  const lang = url.searchParams.get("lang") || "";
+  const name =
+    (record.name || "").trim() ||
+    (String(lang).toLowerCase().startsWith("en") ? "Personal card" : "بطاقة شخصية");
   const initial = name.trim().charAt(0).toUpperCase() || "؟";
   const country = String(record.country || "").trim();
 
-  return renderBusinessCard({ record, origin, canonical, name, initial, country });
+  return renderBusinessCard({ record, origin, canonical, name, initial, country, lang });
 }
